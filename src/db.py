@@ -6,7 +6,7 @@ class Course(db.Model):
     """
     Course Model
     """
-    ___tablename___ = "courses"
+    __tablename__ = "courses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     code = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -54,7 +54,7 @@ class User(db.Model):
             "netid": self.netid
         }
     
-class Assignments(db.Model):
+class Assignment(db.Model):
     """
     Assignment Model
     """
@@ -68,7 +68,7 @@ class Assignments(db.Model):
         Initialize an Assignment object
         """
         self.title = kwargs.get("title", "")
-        self.due_date = kwargs.get("due_date", "")
+        self.due_date = kwargs.get("due_date", None)
 
     def serialize(self):
         """
