@@ -41,9 +41,9 @@ def create_a_course():
     course_name = body.get("name", None)
 
     if course_code is None:
-        return failure_response({"error": "course code is required"}, 400)
+        return failure_response("course code is required", 400)
     if course_name is None:
-        return failure_response({"error": "course name is required"}, 400)
+        return failure_response("course name is required", 400)
     
     new_course = Course(
         code = course_code,
@@ -57,12 +57,26 @@ def create_a_course():
 @app.route("/api/courses/<int:course_id>/", methods=["GET"])
 def get_specific_course(course_id):
     """
-    Get a specific user
+    Get a specific course
     """
-    course = Course.query.filter(Course.id==course_id).first()
+    course = Course.query.filter_by(id=course_id).first()
     if course is None:
-        return failure_response({"error": "Task not found"}, 400)
+        return failure_response("Course not found", 400)
     return success_response(course.serialize(), 200)
+
+
+@app.route("/api/courses/<int:course_id>/", methods=["DELETE"])
+def delete_specific_course(course_id):
+    """
+    Delete a course with id `course_id`
+    """
+    course = Course.query.filter_by(id=course_id).first()
+    if course is None:
+        return failure_response("Course not found", 400)
+    db.session.delete(course)
+    db.session.commit()
+    return success_response(course.serialize(), 200)
+
 
 
 if __name__ == "__main__":
