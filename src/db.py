@@ -53,3 +53,29 @@ class User(db.Model):
             "name": self.name,
             "netid": self.netid
         }
+    
+class Assignments(db.Model):
+    """
+    Assignment Model
+    """
+    __tablename__ = "assignments"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String, nullable=False)
+    due_date = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, **kwargs):
+        """
+        Initialize an Assignment object
+        """
+        self.title = kwargs.get("title", "")
+        self.due_date = kwargs.get("due_date", "")
+
+    def serialize(self):
+        """
+        Serialize an Assignment object
+        """
+        return {
+            "id": self.id, 
+            "title": self.title,
+            "due_date": self.due_date
+        }
