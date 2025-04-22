@@ -70,7 +70,8 @@ class User(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "netid": self.netid
+            "netid": self.netid,
+            "courses": [c.serialize() for c in self.enrolled_courses]
         }
     
 class Assignment(db.Model):
