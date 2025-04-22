@@ -104,10 +104,49 @@ def create_a_user():
 
 @app.route("/api/users/<int:user_id>/", methods=["GET"])
 def get_specific_user(user_id):
+    """
+    Get a specific user with id `user_id`
+    """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
         return failure_response("User not found", 400)
     return success_response(user.serialize(), 200)
+
+
+@app.route("/api/courses/<int:course_id>/add/", methods=["POST"])
+def add_user_to_course(course_id):
+    """
+    Add a user to a course with id `course_id`
+    """
+    data = request.get_json()
+    user_id = data.get("user_id", None)
+    user_type = data.get("type", None)
+
+    if user_id is None:
+        return failure_response("User field is required", 400)
+    if user_type is None or user_type not in ["student", "instructor"]:
+        return failure_response("Type field not provided or invalid type", 400)
+    
+    course = Course.query.get(course_id)
+    user = User.query.get(user_id)
+
+    if course is None:
+        return failure_response("Course not found", 404)
+    if user is None:
+        return failure_response("User not found", 404)
+    
+    if user_type == "student":
+        if user not in course.students:
+            course.students.append(user)
+    elif user_type == "instructor":
+        if user not in course.instructors:
+            course.instructors.append(user)
+    
+    db.session.commit()
+    return success_response(course.serialize(), 200)
+    
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
