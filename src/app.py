@@ -22,6 +22,7 @@ def failure_response(message, code=404):
     return json.dumps({'error': message}), code
 
 # your routes here
+
 @app.route("/api/courses/", methods=["GET"])
 def get_all_courses():
     """
@@ -29,8 +30,12 @@ def get_all_courses():
     """
     return success_response({"courses": [c.serialize() for c in Course.query.all()]})
 
+
 @app.route("/api/courses/", methods=["POST"])
 def create_a_course():
+    """
+    Create a course
+    """
     body = request.get_json()
     course_code = body.get("code", None)
     course_name = body.get("name", None)
@@ -47,6 +52,18 @@ def create_a_course():
     db.session.add(new_course)
     db.session.commit()
     return success_response(new_course.serialize(), 201)
+
+
+@app.route("/api/courses/<int:course_id>/", methods=["GET"])
+def get_specific_course(course_id):
+    """
+    Get a specific user
+    """
+    course = Course.query.filter(Course.id==course_id).first()
+    if course is None:
+        return failure_response({"error": "Task not found"}, 400)
+    return success_response(course.serialize(), 200)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
