@@ -1,5 +1,5 @@
 from db import db
-from flask import Flask
+from flask import Flask, request
 from db import db, Course, User, Assignment
 
 import json
@@ -28,6 +28,25 @@ def get_all_courses():
     Get all courses
     """
     return success_response({"courses": [c.serialize() for c in Course.query.all()]})
+
+@app.route("/api/courses/", methods=["POST"])
+def create_a_course():
+    body = request.get_json()
+    course_code = body.get("code", None)
+    course_name = body.get("name", None)
+
+    if course_code is None:
+        return failure_response({"error": "course code is required"}, 400)
+    if course_name is None:
+        return failure_response({"error": "course name is required"}, 400)
+    
+    new_course = Course(
+        code = course_code,
+        name = course_name
+    )
+    db.session.add(new_course)
+    db.session.commit()
+    return success_response(new_course.serialize(), 201)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
