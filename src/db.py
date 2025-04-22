@@ -42,7 +42,7 @@ class Course(db.Model):
             "id": self.id,
             "code": self.code,
             "name": self.name,
-            "assignments": [a.serialize() for a in self.assignments],
+            "assignments": [a.serialize_basic() for a in self.assignments],
             "instructors": [i.serialize_basic() for i in self.instructors],
             "students": [s.serialize_basic() for s in self.students]
         }
@@ -71,7 +71,7 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "netid": self.netid,
-            "courses": [c.serialize() for c in self.enrolled_courses]
+            "courses": [c.serialize_basic() for c in self.enrolled_courses]
         }
 
     def serialize_basic(self):
@@ -114,3 +114,11 @@ class Assignment(db.Model):
             "name": self.course.name
             }
         }
+    
+    def serialize_basic(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "due_date": self.due_date
+        }
+

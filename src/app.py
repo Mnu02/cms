@@ -1,5 +1,5 @@
 from db import db
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from db import db, Course, User, Assignment
 
 import json
@@ -16,11 +16,10 @@ with app.app_context():
     db.create_all()
 
 def success_response(body, code=200):
-    return json.dumps(body), code
+    return jsonify(body), code
 
 def failure_response(message, code=404):
-    return json.dumps({'error': message}), code
-
+    return jsonify({"error": message}), code
 # your routes here
 
 @app.route("/api/courses/", methods=["GET"])
@@ -36,7 +35,9 @@ def create_a_course():
     """
     Create a course
     """
-    body = request.get_json()
+    body = request.get_json(force=True)
+    if body is None:
+        return failure_response("Request body must be JSON", 400)
     course_code = body.get("code", None)
     course_name = body.get("name", None)
 
@@ -61,7 +62,7 @@ def get_specific_course(course_id):
     """
     course = Course.query.filter_by(id=course_id).first()
     if course is None:
-        return failure_response("Course not found", 400)
+        return failure_response("Course not found", 404)
     return success_response(course.serialize(), 200)
 
 
@@ -72,7 +73,7 @@ def delete_specific_course(course_id):
     """
     course = Course.query.filter_by(id=course_id).first()
     if course is None:
-        return failure_response("Course not found", 400)
+        return failure_response("Course not found", 404)
     db.session.delete(course)
     db.session.commit()
     return success_response(course.serialize(), 200)
@@ -83,7 +84,7 @@ def create_a_user():
     """
     Create a user
     """
-    body = request.get_json()
+    body = request.get_json(force=True)
     user_name = body.get("name", None)
     user_netid = body.get("netid", None)
 
@@ -109,7 +110,7 @@ def get_specific_user(user_id):
     """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
-        return failure_response("User not found", 400)
+        return failure_response("User not found", 404)
     return success_response(user.serialize(), 200)
 
 
@@ -118,7 +119,7 @@ def add_user_to_course(course_id):
     """
     Add a user to a course with id `course_id`
     """
-    data = request.get_json()
+    data = request.get_json(force=True)
     user_id = data.get("user_id", None)
     user_type = data.get("type", None)
 
@@ -151,7 +152,7 @@ def create_assignment(course_id):
     """
     Create an assignment for a course with id `course_id`
     """
-    data = request.get_json()
+    data = request.get_json(force=True)
     ass_title = data.get("title", None)
     ass_due_date = data.get("due_date", None)
 
@@ -172,4 +173,4 @@ def create_assignment(course_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
