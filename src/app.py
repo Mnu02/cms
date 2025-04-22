@@ -102,5 +102,12 @@ def create_a_user():
     return success_response(new_user.serialize(), 201)
 
 
+@app.route("/api/users/<int:user_id>/", methods=["GET"])
+def get_specific_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found", 400)
+    return success_response(user.serialize(), 200)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
