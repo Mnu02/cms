@@ -146,6 +146,29 @@ def add_user_to_course(course_id):
     return success_response(course.serialize(), 200)
     
 
+@app.route("/api/courses/<int:course_id>/assignment/", methods=["POST"])
+def create_assignment(course_id):
+    """
+    Create an assignment for a course with id `course_id`
+    """
+    data = request.get_json()
+    ass_title = data.get("title", None)
+    ass_due_date = data.get("due_date", None)
+
+    if ass_title is None:
+        return failure_response("title is required", 400)
+    if ass_due_date is None:
+        return failure_response("due date is required", 400)
+    
+    new_assignment = Assignment(
+        title=ass_title,
+        due_date=ass_due_date,
+        course_id=course_id
+    )
+
+    db.session.add(new_assignment)
+    db.session.commit()
+    return success_response(new_assignment.serialize(), 201)
 
 
 if __name__ == "__main__":

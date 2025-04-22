@@ -107,5 +107,10 @@ class Assignment(db.Model):
         return {
             "id": self.id, 
             "title": self.title,
-            "due_date": self.due_date
+            "due_date": self.due_date,
+            "course": {
+            "id": self.course.id,
+            "code": self.course.code,
+            "name": self.course.name
+            }
         }
