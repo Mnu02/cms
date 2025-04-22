@@ -78,6 +78,29 @@ def delete_specific_course(course_id):
     return success_response(course.serialize(), 200)
 
 
+@app.route("/api/users/", methods=["POST"])
+def create_a_user():
+    """
+    Create a user
+    """
+    body = request.get_json()
+    user_name = body.get("name", None)
+    user_netid = body.get("netid", None)
+
+    if user_name is None:
+        return failure_response("User name is required", 400)
+    if user_netid is None:
+        return failure_response("User netid is required", 400)
+    
+    new_user = User(
+        name = user_name,
+        netid = user_netid
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+    return success_response(new_user.serialize(), 201)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
